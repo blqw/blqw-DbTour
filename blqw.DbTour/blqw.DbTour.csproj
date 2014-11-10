@@ -1,0 +1,124 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{046B3E2C-AA52-4884-8FF3-A14FDAC1153E}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>blqw</RootNamespace>
+    <AssemblyName>blqw.DbTour</AssemblyName>
+    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;NF2</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.configuration" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Core\Assertor.cs" />
+    <Compile Include="Core\QuickStringWriter.cs" />
+    <Compile Include="DBHelper\Base\DBHelper.cs" />
+    <Compile Include="DBHelper\Base\DBHelper_Implement.cs" />
+    <Compile Include="DBHelper\Interface\IConnector.cs" />
+    <Compile Include="DBHelper\Interface\IDBHelper.cs" />
+    <Compile Include="DBHelper\Interface\IExecuteResult.cs" />
+    <Compile Include="DBHelper\SqlServer\SqlServerConnector.cs" />
+    <Compile Include="DBHelper\SqlServer\SqlServerHelper.cs" />
+    <Compile Include="DBHelper\Tools\CommandArgs.cs" />
+    <Compile Include="DBHelper\Tools\Connector.cs" />
+    <Compile Include="DBHelper\Tools\ConnectorPool.cs" />
+    <Compile Include="DBHelper\Tools\ExecuteAction.cs" />
+    <Compile Include="DBHelper\Tools\GetConnectionHandler.cs" />
+    <Compile Include="DBHelper\Tools\SimpleCounter.cs" />
+    <Compile Include="RowRecord.cs" />
+    <Compile Include="DbTour.cs" />
+    <Compile Include="SqlBuilder.cs" />
+    <Compile Include="VarObejct.cs" />
+    <Compile Include="FQL\FQL.cs" />
+    <Compile Include="FQL\interface\IFQLBuilder.cs" />
+    <Compile Include="FQL\interface\IFQLProvider.cs" />
+    <Compile Include="FQL\interface\IFQLResult.cs" />
+    <Compile Include="FQL\private\FQLBuilder.cs" />
+    <Compile Include="FQL\private\FQLCommand.cs" />
+    <Compile Include="FQL\private\FQLResult.cs" />
+    <Compile Include="FQL\providers\SqlServerFQL.cs" />
+    <Compile Include="IExecuter.cs" />
+    <Compile Include="Literacy\AttributeCollection.cs" />
+    <Compile Include="Literacy\Convert2.cs" />
+    <Compile Include="Literacy\Delegate.cs" />
+    <Compile Include="Literacy\ILoadMember.cs" />
+    <Compile Include="Literacy\Literacy.cs" />
+    <Compile Include="Literacy\ObjectProperty.cs" />
+    <Compile Include="Literacy\ObjectPropertyCollection.cs" />
+    <Compile Include="Literacy\TypeCodes.cs" />
+    <Compile Include="Literacy\TypeInfo.cs" />
+    <Compile Include="Literacy\TypesHelper.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PreBuildEvent>xcopy "$(ProjectDir)..\..\blqw.Literacy\Literacy\Literacy" "$(ProjectDir)Literacy" /s /c /i /y
+rd /s /q "$(ProjectDir)Literacy\bin"
+rd /s /q "$(ProjectDir)Literacy\obj"
+rd /s /q "$(ProjectDir)Literacy\Properties"
+del /f /s /q "$(ProjectDir)Literacy\*.csproj"
+del /f /s /q "$(ProjectDir)Literacy\*.csproj.user"
+del /f /s /q "$(ProjectDir)Literacy\*.sln"
+
+xcopy "$(ProjectDir)..\..\blqw-core\blqw.Core" "$(ProjectDir)Core" /s /c /i /y
+rd /s /q "$(ProjectDir)Core\bin"
+rd /s /q "$(ProjectDir)Core\obj"
+rd /s /q "$(ProjectDir)Core\Properties"
+del /f /s /q "$(ProjectDir)Core\*.csproj"
+del /f /s /q "$(ProjectDir)Core\*.csproj.user"
+del /f /s /q "$(ProjectDir)Core\*.sln"
+
+xcopy "$(ProjectDir)..\..\blqw-dbhelper\blqw.DBHelper" "$(ProjectDir)DBHelper" /s /c /i /y
+rd /s /q "$(ProjectDir)DBHelper\bin"
+rd /s /q "$(ProjectDir)DBHelper\obj"
+rd /s /q "$(ProjectDir)DBHelper\Properties"
+del /f /s /q "$(ProjectDir)DBHelper\*.csproj"
+del /f /s /q "$(ProjectDir)DBHelper\*.csproj.user"
+del /f /s /q "$(ProjectDir)DBHelper\*.sln"
+
+xcopy "$(ProjectDir)..\..\blqw-fql\blqw.FQL" "$(ProjectDir)FQL" /s /c /i /y
+rd /s /q "$(ProjectDir)FQL\bin"
+rd /s /q "$(ProjectDir)FQL\obj"
+rd /s /q "$(ProjectDir)FQL\Properties"
+del /f /s /q "$(ProjectDir)FQL\*.csproj"
+del /f /s /q "$(ProjectDir)FQL\*.csproj.user"
+del /f /s /q "$(ProjectDir)FQL\*.sln"
+
+exit 0</PreBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Common;
 using System.Text;
 
 namespace blqw
@@ -50,12 +51,30 @@ namespace blqw
         /// </summary>
         /// <param name="commandText">sql语句</param>
         /// <param name="args">参数</param>
-        IExecuter Sql(string commandText, params object[] args);
+        public DbExecuter Sql(string commandText, params object[] args)
+        {
+            var fql = FQL.Format(_FQLProvider, commandText, args);
+            return new DbExecuter(_DBHelper, CommandType.Text, fql.CommandText, fql.DbParameters);
+        }
         /// <summary> 设置存储过程名称和参数,得到执行器
         /// </summary>
         /// <param name="procedureName">存储过程名称</param>
         /// <param name="args">参数</param>
-        IExecuter Proc(string procedureName, params object[] args);
+        public DbExecuter Proc(string procedureName, params object[] args)
+        {
+            if (args == null)
+            {
+                return new DbExecuter(_DBHelper, CommandType.StoredProcedure, procedureName, new DbParameter[0]);
+            }
+            var length = args.Length;
+            DbParameter[] parameters = new DbParameter[length];
+            for (int i = 0; i < length; i++)
+            {
+                var p = args[i] as DbParameter;
+                parameters[i] = (p == null) ? _FQLProvider.CreateDbParameter(args[i]) : p;
+            }
+            return new DbExecuter(_DBHelper, CommandType.StoredProcedure, procedureName, parameters);
+        }
 
 
         #region transaction

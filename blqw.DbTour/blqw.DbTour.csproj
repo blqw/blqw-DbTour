@@ -40,6 +40,7 @@
   <ItemGroup>
     <Compile Include="Core\Assertor.cs" />
     <Compile Include="Core\QuickStringWriter.cs" />
+    <Compile Include="DbExecuter.cs" />
     <Compile Include="DBHelper\Base\DBHelper.cs" />
     <Compile Include="DBHelper\Base\DBHelper_Implement.cs" />
     <Compile Include="DBHelper\Interface\IConnector.cs" />

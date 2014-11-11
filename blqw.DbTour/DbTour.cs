@@ -11,15 +11,37 @@ namespace blqw
         public DbTour(string connectionName)
         {
             _DBHelper = DBHelper.Create(connectionName);
+            Initialize();
         }
+
 
         public DbTour(string connectionString, string providerName)
         {
             _DBHelper = DBHelper.Create(connectionString, providerName);
+            Initialize();
+        }
+
+        private void Initialize()
+        {
+            Assertor.AreNull(_DBHelper, "DBHelper");
+            var factory = _DBHelper as IDbComponentFactory;
+            if (factory == null)
+            {
+                if (_DBHelper is SqlServerHelper)
+                {
+                    _FQLProvider = SqlServerFQL.Instance;
+                    _Saw = null;
+                    return;
+                }
+                throw new NotSupportedException(TypesHelper.DisplayName(_DBHelper.GetType()) + " 没有实现 IDbComponentFactory 接口");
+            }
+            _FQLProvider = factory.CreateFQLProvider();
+            _Saw = factory.CreateSaw();
         }
 
         internal IDBHelper _DBHelper;
         internal IFQLProvider _FQLProvider;
+        internal ISaw _Saw;
         #region config
         /// <summary> 定义数据库连接字符串值
         /// </summary>

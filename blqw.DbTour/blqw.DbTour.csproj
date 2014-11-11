@@ -54,6 +54,16 @@
     <Compile Include="DBHelper\Tools\ExecuteAction.cs" />
     <Compile Include="DBHelper\Tools\GetConnectionHandler.cs" />
     <Compile Include="DBHelper\Tools\SimpleCounter.cs" />
+    <Compile Include="Faller\argument\enum\BinaryOperator.cs" />
+    <Compile Include="Faller\argument\enum\BitOperator.cs" />
+    <Compile Include="Faller\argument\enum\DateTimeField.cs" />
+    <Compile Include="Faller\argument\enum\DustType.cs" />
+    <Compile Include="Faller\argument\enum\LikeOperator.cs" />
+    <Compile Include="Faller\argument\enum\ShiftOperator.cs" />
+    <Compile Include="Faller\argument\SqlExpr.cs" />
+    <Compile Include="Faller\interface\ISaw.cs" />
+    <Compile Include="Faller\interface\ISawDust.cs" />
+    <Compile Include="IDbComponentFactory.cs" />
     <Compile Include="RowRecord.cs" />
     <Compile Include="DbTour.cs" />
     <Compile Include="SqlBuilder.cs" />
@@ -81,7 +91,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PreBuildEvent>xcopy "$(ProjectDir)..\..\blqw.Literacy\Literacy\Literacy" "$(ProjectDir)Literacy" /s /c /i /y
+    <PreBuildEvent>xcopy "$(ProjectDir)..\..\blqw.Literacy\blqw.Literacy" "$(ProjectDir)Literacy" /s /c /i /y
 rd /s /q "$(ProjectDir)Literacy\bin"
 rd /s /q "$(ProjectDir)Literacy\obj"
 rd /s /q "$(ProjectDir)Literacy\Properties"
@@ -112,6 +122,14 @@ rd /s /q "$(ProjectDir)FQL\Properties"
 del /f /s /q "$(ProjectDir)FQL\*.csproj"
 del /f /s /q "$(ProjectDir)FQL\*.csproj.user"
 del /f /s /q "$(ProjectDir)FQL\*.sln"
+
+xcopy "$(ProjectDir)..\..\blqw-faller\blqw.Faller" "$(ProjectDir)Faller" /s /c /i /y
+rd /s /q "$(ProjectDir)Faller\bin"
+rd /s /q "$(ProjectDir)Faller\obj"
+rd /s /q "$(ProjectDir)Faller\Properties"
+del /f /s /q "$(ProjectDir)Faller\*.csproj"
+del /f /s /q "$(ProjectDir)Faller\*.csproj.user"
+del /f /s /q "$(ProjectDir)Faller\*.sln"
 
 exit 0</PreBuildEvent>
   </PropertyGroup>

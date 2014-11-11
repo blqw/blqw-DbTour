@@ -56,7 +56,7 @@
   <ItemGroup>
     <ProjectReference Include="..\blqw.DbTour\blqw.DbTour.csproj">
       <Project>{046b3e2c-aa52-4884-8ff3-a14fdac1153e}</Project>
-      <Name>DbTour</Name>
+      <Name>blqw.DbTour</Name>
     </ProjectReference>
   </ItemGroup>
   <Choose>

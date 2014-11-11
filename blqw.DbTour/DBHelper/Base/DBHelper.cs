@@ -52,6 +52,7 @@ namespace blqw
                 case "sqlserver":
                 case "mssql":
                 case "sqlclient":
+                case "system.data.sqlclient":
                     return new SqlServerHelper();
                 default:
                     break;

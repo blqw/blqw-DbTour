@@ -8,6 +8,17 @@ namespace blqw
 {
     public sealed class DbTour : IDisposable
     {
+        //public DbTour()
+        //{
+        //    var configs = System.Configuration.ConfigurationManager.ConnectionStrings;
+        //    if (configs.Count == 0)
+        //    {
+        //        throw new NotSupportedException("缺少配置信息");
+        //    }
+        //    var name = configs[0].Name;
+        //    _DBHelper = DBHelper.Create(name);
+        //    Initialize();
+        //}
         public DbTour(string connectionName)
         {
             _DBHelper = DBHelper.Create(connectionName);

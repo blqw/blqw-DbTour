@@ -87,7 +87,7 @@ namespace blqw
         public DbExecuter Sql(string commandText, params object[] args)
         {
             var fql = FQL.Format(_FQLProvider, commandText, args);
-            return new DbExecuter(_DBHelper, CommandType.Text, fql.CommandText, fql.DbParameters);
+            return new DbExecuter(_DBHelper, CommandType.Text, fql.CommandText, fql.DbParameters, fql.ImportOutParameter);
         }
         /// <summary> 设置存储过程名称和参数,得到执行器
         /// </summary>
@@ -97,7 +97,7 @@ namespace blqw
         {
             if (args == null)
             {
-                return new DbExecuter(_DBHelper, CommandType.StoredProcedure, procedureName, new DbParameter[0]);
+                return new DbExecuter(_DBHelper, CommandType.StoredProcedure, procedureName, new DbParameter[0], null);
             }
             var length = args.Length;
             DbParameter[] parameters = new DbParameter[length];
@@ -106,7 +106,7 @@ namespace blqw
                 var p = args[i] as DbParameter;
                 parameters[i] = (p == null) ? _FQLProvider.CreateDbParameter(args[i]) : p;
             }
-            return new DbExecuter(_DBHelper, CommandType.StoredProcedure, procedureName, parameters);
+            return new DbExecuter(_DBHelper, CommandType.StoredProcedure, procedureName, parameters, null);
         }
 
 

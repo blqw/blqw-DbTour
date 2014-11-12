@@ -14,12 +14,13 @@ namespace blqw
             _commandType = CommandType.Text;
         }
 
-        public DbExecuter(IDBHelper helper, CommandType commandType, string commandtext, DbParameter[] parameters)
+        public DbExecuter(IDBHelper helper, CommandType commandType, string commandtext, DbParameter[] parameters, System.Threading.ThreadStart executed)
         {
             _helper = helper;
             CommandText = commandtext;
             Parameters = parameters;
             _commandType = commandType;
+            Executed = executed;
         }
 
         private IDBHelper _helper;
@@ -28,12 +29,15 @@ namespace blqw
         public virtual string CommandText { get; private set; }
         public virtual DbParameter[] Parameters { get; private set; }
 
+        private System.Threading.ThreadStart Executed;
 
-        protected virtual void Executed()
+        protected virtual void OnExecuted()
         {
-
+            if (Executed != null)
+            {
+                Executed();
+            }
         }
-
 
         public VarObejct GetOutValue(string name)
         {
@@ -63,7 +67,7 @@ namespace blqw
             }
             finally
             {
-                Executed();
+                OnExecuted();
             }
         }
 
@@ -76,7 +80,7 @@ namespace blqw
             }
             finally
             {
-                Executed();
+                OnExecuted();
             }
         }
 
@@ -93,7 +97,7 @@ namespace blqw
             }
             finally
             {
-                Executed();
+                OnExecuted();
             }
         }
 
@@ -110,7 +114,7 @@ namespace blqw
             }
             finally
             {
-                Executed();
+                OnExecuted();
             }
         }
 
@@ -123,7 +127,7 @@ namespace blqw
             }
             finally
             {
-                Executed();
+                OnExecuted();
             }
         }
 
@@ -136,7 +140,7 @@ namespace blqw
             }
             finally
             {
-                Executed();
+                OnExecuted();
             }
         }
 
@@ -149,7 +153,7 @@ namespace blqw
             }
             finally
             {
-                Executed();
+                OnExecuted();
             }
         }
 
@@ -162,7 +166,7 @@ namespace blqw
             }
             finally
             {
-                Executed();
+                OnExecuted();
             }
         }
 
@@ -170,7 +174,7 @@ namespace blqw
         {
             _parameters = Parameters;
             _helper.ExecuteNonQuery(_commandType, CommandText, _parameters);
-            Executed();
+            OnExecuted();
         }
 
         public List<T> ToList<T>() where T : new()
@@ -185,7 +189,7 @@ namespace blqw
             }
             finally
             {
-                Executed();
+                OnExecuted();
             }
         }
 
@@ -208,7 +212,7 @@ namespace blqw
             }
             finally
             {
-                Executed();
+                OnExecuted();
             }
         }
 
@@ -230,7 +234,7 @@ namespace blqw
             }
             finally
             {
-                Executed();
+                OnExecuted();
             }
         }
 
@@ -251,8 +255,107 @@ namespace blqw
             }
             finally
             {
-                Executed();
+                OnExecuted();
             }
         }
+
+        public List<object> ToList()
+        {
+            if (DynamicType == null)
+            {
+                InitDynamicType();
+            }
+
+            try
+            {
+                _parameters = Parameters;
+                using (var reader = _helper.ExecuteReader(_commandType, CommandText, _parameters))
+                {
+                    List<object> list = new List<object>();
+                    var length = reader.FieldCount;
+                    string[] name = new string[length];
+
+                    if (reader.Read())
+                    {
+                        var model = (IDictionary<string, object>)Activator.CreateInstance(DynamicType);
+                        for (int i = 0; i < length; i++)
+                        {
+                            model.Add(name[i] = reader.GetName(i), new VarObejct(reader[i]));
+                        }
+                        list.Add(model);
+                    }
+                    while (reader.Read())
+                    {
+                        var model = (IDictionary<string, object>)Activator.CreateInstance(DynamicType);
+                        for (int i = 0; i < length; i++)
+                        {
+                            model.Add(name[i], new VarObejct(reader[i]));
+                        }
+                        list.Add(model);
+                    }
+                    return list;
+                }
+            }
+            finally
+            {
+                OnExecuted();
+            }
+        }
+
+        public object FirstOrDefault(object defaultValue = null)
+        {
+            if (DynamicType == null)
+            {
+                InitDynamicType();
+            }
+            try
+            {
+                _parameters = Parameters;
+                using (var reader = _helper.ExecuteReader(_commandType, CommandText, _parameters))
+                {
+                    if (reader.Read())
+                    {
+                        var model = (IDictionary<string, object>)Activator.CreateInstance(DynamicType);
+                        var length = reader.FieldCount;
+                        for (int i = 0; i < length; i++)
+                        {
+                            model.Add(reader.GetName(i), new VarObejct(reader[i]));
+                        }
+                        return model;
+                    }
+                    return defaultValue;
+                }
+            }
+            finally
+            {
+                OnExecuted();
+            }
+        }
+
+        #region 动态类型
+        static Type DynamicType;
+        static void InitDynamicType()
+        {
+            DynamicType = Type.GetType("System.Dynamic.ExpandoObject, System.Core, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089");
+            if (DynamicType != null)
+            {
+                return;
+            }
+            var ass = AppDomain.CurrentDomain.GetAssemblies();
+            var length = ass.Length;
+            for (int i = 0; i < length; i++)
+            {
+                if (ass[i].GetName().Name == "System.Core")
+                {
+                    DynamicType = ass[i].GetType("System.Dynamic.ExpandoObject");
+                    break;
+                }
+            }
+            if (DynamicType == null)
+            {
+                throw new TypeLoadException("dynamic类型加载失败!");
+            }
+        } 
+        #endregion
     }
 }

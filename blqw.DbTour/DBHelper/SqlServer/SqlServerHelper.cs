@@ -22,21 +22,6 @@ namespace blqw
             get { return SqlClientFactory.Instance; }
         }
 
-        protected override DbCommand GetCommand(CommandType commandType, string commandText, DbParameter[] parameters)
-        {
-            var cmd = new SqlCommand(commandText, _connector.DbConnection, _connector.Transaction);
-            if (parameters != null && parameters.Length > 0)
-            {
-                var p = parameters as SqlParameter[];
-                if (p == null)
-                {
-                    throw new ArgumentOutOfRangeException("DbParameter类型错误");
-                }
-                cmd.Parameters.AddRange(p);
-            }
-            return cmd;
-        }
-
         protected override void Open()
         {
             base.Open();
@@ -103,6 +88,13 @@ namespace blqw
                 ((SqlServerConnector)_connector).Rollback(_tranPoint);
                 base.Dispose();
             }
+        }
+
+        protected override DbCommand GetCommand(CommandType commandType, string commandText, DbParameter[] parameters)
+        {
+            var cmd = base.GetCommand(commandType, commandText, parameters);
+            cmd.Transaction = _connector.Transaction;
+            return cmd;
         }
     }
 }

@@ -76,7 +76,6 @@
     <Compile Include="FQL\private\FQLCommand.cs" />
     <Compile Include="FQL\private\FQLResult.cs" />
     <Compile Include="FQL\providers\SqlServerFQL.cs" />
-    <Compile Include="IExecuter.cs" />
     <Compile Include="Literacy\AttributeCollection.cs" />
     <Compile Include="Literacy\Convert2.cs" />
     <Compile Include="Literacy\Delegate.cs" />

@@ -8,16 +8,15 @@
 
 
 ##更新说明
-#### 挂起项目,重构下思路
 
-#### 2014.11.12 
+##### 2014.11.12 
 * 整合 3个数据库操作工具类库 [DBHelper](https://coding.net/u/blqw/p/blqw-DBHelper/git),[FQL](https://coding.net/u/blqw/p/blqw-FQL/git),[Faller](https://coding.net/u/blqw/p/blqw-Faller/git) 打造DbTour
 * 初始版本代码完成 Demo完成
 
 
 
 ## 灵活的手写Sql
-#### 1. 参数化Sql,全面采用微软string.Format风格编程
+##### 1. 参数化Sql,全面采用微软string.Format风格编程
 ```csharp
 using (var db = new DbTour("default"))
 {
@@ -26,7 +25,7 @@ using (var db = new DbTour("default"))
 }
 ```
 
-#### 2. 灵活的Format传递模式
+##### 2. 灵活的Format传递模式
 `*` 遵循数据库**忽略大小写**的编码规则
 ```csharp
 using (var db = new DbTour("default"))
@@ -36,7 +35,7 @@ using (var db = new DbTour("default"))
 }
 ```
 
-#### 3. 方便的out返回参数
+##### 3. 方便的out返回参数
 `*` 格式化参数规则同**C#编程规则**,方便好记
 `*` 参数支持匿名类
 `*` 支持**输出参数**
@@ -49,7 +48,7 @@ using (var db = new DbTour("default"))
 }
 ```
 
-#### 4. 支持DbParameter参数调用
+##### 4. 支持DbParameter参数调用
 `*` 如果数据库参数类型无法使用C#类型映射,比如Oracle的Cursor,也可以**直接使用DbParameter对象**
 ```csharp
 using (var db = new DbTour("default"))
@@ -67,7 +66,7 @@ using (var db = new DbTour("default"))
 
 ## 方便的实体转换
 
-#### 1. 仿Linq的方法名称
+##### 1. 仿Linq的方法名称
 ```csharp
 using (var db = new DbTour("default"))
 {
@@ -80,7 +79,7 @@ using (var db = new DbTour("default"))
     Console.WriteLine("{0} | {1} | {2} | {3}", b.ID, b.Name, b.Sex, b.Birthday);
 }
 ```
-#### 2. 完全自动的类型转换
+##### 2. 完全自动的类型转换
 ```csharp
 using (var db = new DbTour("default"))
 {
@@ -93,7 +92,7 @@ using (var db = new DbTour("default"))
     Console.WriteLine(b);
 }
 ```
-#### 3. 支持动态类型(需.NET4.0以上)
+##### 3. 支持动态类型(需.NET4.0以上)
 ```csharp
 using (var db = new DbTour("default"))
 {
@@ -106,7 +105,7 @@ using (var db = new DbTour("default"))
     Console.WriteLine("{0} | {1} | {2} | {3}", b.ID, b.Name, b.Sex, b.Birthday);
 }
 ```
-#### 4. 拓展原生方法
+##### 4. 拓展原生方法
 `*` 由于DataReader需要及时释放,所以和原生的方法稍有不同   
 `*` 增加了原生中没有的ExecuteDataSet()方法
 ```csharp
@@ -130,7 +129,7 @@ using (var db = new DbTour("default"))
 ```
 
 ## 合理的DbConnection调用
-#### 1. 内部调用时使用同一个Connection,避免多次Open(),Close()
+##### 1. 内部调用时使用同一个Connection,避免多次Open(),Close()
 ```csharp
 
 static void Main(string[] args)
@@ -156,7 +155,7 @@ static string GetName(int id)
 
 ```
 
-#### 2. 支持当前线程跨方法的事务
+##### 2. 支持当前线程跨方法的事务
 ```csharp
 //方法仅作为演示使用
 static void Main(string[] args)

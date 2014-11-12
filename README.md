@@ -16,70 +16,6 @@
 
 
 
-## 方便的实体转换
-
-#### 1. 仿Linq的方法名称
-```csharp
-using (var db = new DbTour("default"))
-{
-    var list = db.Sql("select * from Test_User").ToList<User>();
-    foreach (var a in list)
-    {
-        Console.WriteLine("{0} | {1} | {2} | {3}", a.ID, a.Name, a.Sex, a.Birthday);
-    }
-    var b = db.Sql("select top 1 * from Test_User").FirstOrDefault<User>();
-    Console.WriteLine("{0} | {1} | {2} | {3}", b.ID, b.Name, b.Sex, b.Birthday);
-}
-```
-#### 2. 完全自动的类型转换
-```csharp
-using (var db = new DbTour("default"))
-{
-    var list = db.Sql("select * from Test_User").ToList(row => new { Id = row["Id"], Name = row["Name"] });
-    foreach (var a in list)
-    {
-        Console.WriteLine("{0} | {1}", a.Id, a.Name);
-    }
-    var b = db.Sql("select count(1) from [User]").ExecuteScalar<int>(-1);
-    Console.WriteLine(b);
-}
-```
-#### 3. .NET4.0以上调用,支持动态类型
-```csharp
-using (var db = new DbTour("default"))
-{
-    dynamic list = db.Sql("select * from Test_User").ToList();
-    foreach (var a in list)
-    {
-        Console.WriteLine("{0} | {1} | {2} | {3}", a.ID, a.Name, a.Sex, a.Birthday);
-    }
-    dynamic b = db.Sql("select top 1 * from Test_User").FirstOrDefault();
-    Console.WriteLine("{0} | {1} | {2} | {3}", b.ID, b.Name, b.Sex, b.Birthday);
-}
-```
-#### 4. 拓展原生方法
-`*` 由于DataReader需要及时释放,所以和原生的方法稍有不同   
-`*` 增加了原生中没有的ExecuteDataSet()方法
-```csharp
-using (var db = new DbTour("default"))
-{
-    db.Sql("select * from Test_User").ExecuteReader(
-        reader => {
-            while (reader.Read())
-            {
-                Console.WriteLine("{0} | {1}", reader[0], reader[1]);
-            }
-        }
-    );
-    var table = db.Sql("select * from Test_User").ExecuteDataTable();
-
-    foreach (DataRow row in table.Rows)
-    {
-        Console.WriteLine(string.Join(" | ", row.ItemArray));
-    }
-}
-```
-
 ## 灵活的手写Sql
 #### 1. 参数化Sql,全面采用微软string.Format风格编程
 ```csharp
@@ -126,6 +62,70 @@ using (var db = new DbTour("default"))
     };
     db.Sql("select {1} = Name from Test_User where ID = {0}", 1, p).Execute();
     Console.WriteLine(p.Value);
+}
+```
+
+## 方便的实体转换
+
+#### 1. 仿Linq的方法名称
+```csharp
+using (var db = new DbTour("default"))
+{
+    var list = db.Sql("select * from Test_User").ToList<User>();
+    foreach (var a in list)
+    {
+        Console.WriteLine("{0} | {1} | {2} | {3}", a.ID, a.Name, a.Sex, a.Birthday);
+    }
+    var b = db.Sql("select top 1 * from Test_User").FirstOrDefault<User>();
+    Console.WriteLine("{0} | {1} | {2} | {3}", b.ID, b.Name, b.Sex, b.Birthday);
+}
+```
+#### 2. 完全自动的类型转换
+```csharp
+using (var db = new DbTour("default"))
+{
+    var list = db.Sql("select * from Test_User").ToList(row => new { Id = row["Id"], Name = row["Name"] });
+    foreach (var a in list)
+    {
+        Console.WriteLine("{0} | {1}", a.Id, a.Name);
+    }
+    var b = db.Sql("select count(1) from [User]").ExecuteScalar<int>();
+    Console.WriteLine(b);
+}
+```
+#### 3. 支持动态类型(需.NET4.0以上)
+```csharp
+using (var db = new DbTour("default"))
+{
+    dynamic list = db.Sql("select * from Test_User").ToList();
+    foreach (var a in list)
+    {
+        Console.WriteLine("{0} | {1} | {2} | {3}", a.ID, a.Name, a.Sex, a.Birthday);
+    }
+    dynamic b = db.Sql("select top 1 * from Test_User").FirstOrDefault();
+    Console.WriteLine("{0} | {1} | {2} | {3}", b.ID, b.Name, b.Sex, b.Birthday);
+}
+```
+#### 4. 拓展原生方法
+`*` 由于DataReader需要及时释放,所以和原生的方法稍有不同   
+`*` 增加了原生中没有的ExecuteDataSet()方法
+```csharp
+using (var db = new DbTour("default"))
+{
+    db.Sql("select * from Test_User").ExecuteReader(
+        reader => {
+            while (reader.Read())
+            {
+                Console.WriteLine("{0} | {1}", reader[0], reader[1]);
+            }
+        }
+    );
+    var table = db.Sql("select * from Test_User").ExecuteDataTable();
+
+    foreach (DataRow row in table.Rows)
+    {
+        Console.WriteLine(string.Join(" | ", row.ItemArray));
+    }
 }
 ```
 

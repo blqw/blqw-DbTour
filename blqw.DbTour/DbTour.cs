@@ -8,17 +8,12 @@ namespace blqw
 {
     public sealed class DbTour : IDisposable
     {
-        //public DbTour()
-        //{
-        //    var configs = System.Configuration.ConfigurationManager.ConnectionStrings;
-        //    if (configs.Count == 0)
-        //    {
-        //        throw new NotSupportedException("缺少配置信息");
-        //    }
-        //    var name = configs[0].Name;
-        //    _DBHelper = DBHelper.Create(name);
-        //    Initialize();
-        //}
+        public DbTour()
+        {
+            _DBHelper = DBHelper.Create();
+            Initialize();
+        }
+
         public DbTour(string connectionName)
         {
             _DBHelper = DBHelper.Create(connectionName);
@@ -47,12 +42,29 @@ namespace blqw
                 throw new NotSupportedException(TypesHelper.DisplayName(_DBHelper.GetType()) + " 没有实现 IDbComponentFactory 接口");
             }
             _FQLProvider = factory.CreateFQLProvider();
+            if (_FQLProvider == null)
+            {
+                throw new NotSupportedException("CreateFQLProvider方法返回值不能为null");
+            }
             _Saw = factory.CreateSaw();
+            if (_FQLProvider == null)
+            {
+                throw new NotSupportedException("CreateSaw方法返回值不能为null");
+            }
         }
 
         internal IDBHelper _DBHelper;
         internal IFQLProvider _FQLProvider;
         internal ISaw _Saw;
+
+        public void TransProvider(IDbTourProvider target)
+        {
+            Assertor.AreNull(target, "target");
+            target.DBHelper = _DBHelper;
+            target.FQLProvider = _FQLProvider;
+            target.Saw = _Saw;
+        }
+
         #region config
         /// <summary> 定义数据库连接字符串值
         /// </summary>

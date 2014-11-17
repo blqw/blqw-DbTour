@@ -41,13 +41,20 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DbTour.cs" />
+    <Compile Include="DbTour_Linq_Demo.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="User.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\blqw.DbTour.Linq\blqw.DbTour.Linq.csproj">
+      <Project>{1f6c1dbd-2d58-4d8e-80ef-a9000565e9ce}</Project>
+      <Name>blqw.DbTour.Linq</Name>
+    </ProjectReference>
     <ProjectReference Include="..\blqw.DbTour\blqw.DbTour.csproj">
       <Project>{046b3e2c-aa52-4884-8ff3-a14fdac1153e}</Project>
       <Name>blqw.DbTour</Name>

@@ -39,9 +39,44 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DbTourProvider.cs" />
+    <Compile Include="Faller\argument\SawDust.cs" />
+    <Compile Include="Faller\implement\BaseSaw.cs" />
+    <Compile Include="Faller\implement\Faller.cs" />
+    <Compile Include="Faller\implement\SqlServerSaw.cs" />
+    <Compile Include="Faller\interface\IFaller.cs" />
+    <Compile Include="Faller\Literacy\AttributeCollection.cs" />
+    <Compile Include="Faller\Literacy\Convert2.cs" />
+    <Compile Include="Faller\Literacy\Delegate.cs" />
+    <Compile Include="Faller\Literacy\ILoadMember.cs" />
+    <Compile Include="Faller\Literacy\Literacy.cs" />
+    <Compile Include="Faller\Literacy\ObjectProperty.cs" />
+    <Compile Include="Faller\Literacy\ObjectPropertyCollection.cs" />
+    <Compile Include="Faller\Literacy\TypeCodes.cs" />
+    <Compile Include="Faller\Literacy\TypeInfo.cs" />
+    <Compile Include="Faller\Literacy\TypesHelper.cs" />
+    <Compile Include="Faller\table\SourceNameAttribute.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="DbTable.cs" />
+    <Compile Include="DbTable1.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\blqw.DbTour\blqw.DbTour.csproj">
+      <Project>{046b3e2c-aa52-4884-8ff3-a14fdac1153e}</Project>
+      <Name>blqw.DbTour</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PreBuildEvent>xcopy "$(ProjectDir)..\..\blqw-Faller\blqw.Faller" "$(ProjectDir)Faller" /s /c /i /y
+rd /s /q "$(ProjectDir)Faller\bin"
+rd /s /q "$(ProjectDir)Faller\obj"
+rd /s /q "$(ProjectDir)Faller\Properties"
+del /f /s /q "$(ProjectDir)Faller\*.csproj"
+del /f /s /q "$(ProjectDir)Faller\*.csproj.user"
+del /f /s /q "$(ProjectDir)Faller\*.sln"</PreBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

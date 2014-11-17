@@ -64,6 +64,7 @@
     <Compile Include="Faller\interface\ISaw.cs" />
     <Compile Include="Faller\interface\ISawDust.cs" />
     <Compile Include="IDbComponentFactory.cs" />
+    <Compile Include="IDbTourProvider.cs" />
     <Compile Include="RowRecord.cs" />
     <Compile Include="DbTour.cs" />
     <Compile Include="SqlBuilder.cs" />

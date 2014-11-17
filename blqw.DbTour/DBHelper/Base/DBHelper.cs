@@ -6,6 +6,32 @@ namespace blqw
 {
     public partial class DBHelper
     {
+        /// <summary> 创建并返回 IDBHelper,获取应用程序下ConnectionStrings中的第一个节点的值
+        /// </summary>
+        /// <returns></returns>
+        public static IDBHelper Create()
+        {
+            var ee = System.Configuration.ConfigurationManager.ConnectionStrings.GetEnumerator();
+            System.Configuration.ConnectionStringSettings config = null;
+            while (ee.MoveNext())
+            {
+                config = (System.Configuration.ConnectionStringSettings)ee.Current;
+                if (config.ElementInformation.IsPresent)
+                {
+                    break;
+                }
+                config = null;
+            }
+            if (config == null)
+            {
+                throw new KeyNotFoundException("不存在任何节点");
+            }
+            var helper = CreateDBHelper(config.ProviderName);
+            helper.ConnectionString = config.ConnectionString;
+            helper.ProviderName = config.ProviderName;
+            helper.Name = config.Name;
+            return helper;
+        }
         /// <summary> 创建并返回 IDBHelper
         /// </summary>
         /// <param name="connectionName">配置节点的名称</param>

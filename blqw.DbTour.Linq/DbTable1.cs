@@ -52,15 +52,29 @@ namespace blqw
 
         public IQueryable<TElement> CreateQuery<TElement>(Expression expression)
         {
-            var expr = expression as LambdaExpression;
-            if (expr == null)
+            if (expression.NodeType != ExpressionType.Call)
             {
-                throw new NotSupportedException("expression不是有效的LambdaExpression对象");
+                throw new NotSupportedException("无法处理");
             }
-            var faller = Faller.Create(expr);
-            var sql = faller.ToWhere(_prov.Saw);
-            Console.WriteLine(sql);
-            return new DbTable<TElement>(_db);
+            var call = (MethodCallExpression)expression;
+            switch (call.Method.Name)
+            {
+                case "Where":
+                    //Expression.Lambda(call.Arguments[1], call.Arguments[0]);
+                    var expr = ((UnaryExpression)call.Arguments[1]).Operand as LambdaExpression;
+                    
+                    if (expr == null)
+                    {
+                        throw new NotSupportedException("expression不是有效的LambdaExpression对象");
+                    }
+                    var faller = Faller.Create(expr);
+                    var sql = faller.ToWhere(_prov.Saw);
+                    Console.WriteLine(sql);
+                    return new DbTable<TElement>(_db);
+                default:
+                    break;
+            }
+            throw new NotImplementedException();
         }
 
         public IQueryable CreateQuery(Expression expression)

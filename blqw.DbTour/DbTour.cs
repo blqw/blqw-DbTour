@@ -6,7 +6,7 @@ using System.Text;
 
 namespace blqw
 {
-    public sealed class DbTour : IDisposable
+    public sealed class DbTour : IDisposable, IDbTourProvider
     {
         public DbTour()
         {
@@ -53,18 +53,10 @@ namespace blqw
             }
         }
 
-        internal IDBHelper _DBHelper;
-        internal IFQLProvider _FQLProvider;
-        internal ISaw _Saw;
-
-        public void TransProvider(IDbTourProvider target)
-        {
-            Assertor.AreNull(target, "target");
-            target.DBHelper = _DBHelper;
-            target.FQLProvider = _FQLProvider;
-            target.Saw = _Saw;
-        }
-
+        private IDBHelper _DBHelper;
+        private IFQLProvider _FQLProvider;
+        private ISaw _Saw;
+        
         #region config
         /// <summary> 定义数据库连接字符串值
         /// </summary>
@@ -158,6 +150,21 @@ namespace blqw
                 _DBHelper.Dispose();
                 _DBHelper = null;
             }
+        }
+
+        IDBHelper IDbTourProvider.DBHelper
+        {
+            get { return _DBHelper; }
+        }
+
+        IFQLProvider IDbTourProvider.FQLProvider
+        {
+            get { return _FQLProvider; }
+        }
+
+        ISaw IDbTourProvider.Saw
+        {
+            get { return _Saw; }
         }
     }
 }

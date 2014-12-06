@@ -6,30 +6,33 @@ namespace blqw
 {
     public partial class DBHelper
     {
+        static System.Configuration.ConnectionStringSettings _FirstConfig; 
         /// <summary> 创建并返回 IDBHelper,获取应用程序下ConnectionStrings中的第一个节点的值
         /// </summary>
         /// <returns></returns>
         public static IDBHelper Create()
         {
-            var ee = System.Configuration.ConfigurationManager.ConnectionStrings.GetEnumerator();
-            System.Configuration.ConnectionStringSettings config = null;
-            while (ee.MoveNext())
+            if (_FirstConfig == null)
             {
-                config = (System.Configuration.ConnectionStringSettings)ee.Current;
-                if (config.ElementInformation.IsPresent)
+                var ee = System.Configuration.ConfigurationManager.ConnectionStrings.GetEnumerator();
+                while (ee.MoveNext())
                 {
-                    break;
+                    _FirstConfig = (System.Configuration.ConnectionStringSettings)ee.Current;
+                    if (_FirstConfig.ElementInformation.IsPresent)
+                    {
+                        break;
+                    }
+                    _FirstConfig = null;
                 }
-                config = null;
+                if (_FirstConfig == null)
+                {
+                    throw new KeyNotFoundException("不存在任何节点");
+                }
             }
-            if (config == null)
-            {
-                throw new KeyNotFoundException("不存在任何节点");
-            }
-            var helper = CreateDBHelper(config.ProviderName);
-            helper.ConnectionString = config.ConnectionString;
-            helper.ProviderName = config.ProviderName;
-            helper.Name = config.Name;
+            var helper = CreateDBHelper(_FirstConfig.ProviderName);
+            helper.ConnectionString = _FirstConfig.ConnectionString;
+            helper.ProviderName = _FirstConfig.ProviderName;
+            helper.Name = _FirstConfig.Name;
             return helper;
         }
         /// <summary> 创建并返回 IDBHelper

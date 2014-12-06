@@ -6,8 +6,8 @@ namespace blqw
 {
     public interface IDbTourProvider
     {
-        IDBHelper DBHelper { get; set; }
-        IFQLProvider FQLProvider { get; set; }
-        ISaw Saw { get; set; }
+        IDBHelper DBHelper { get;}
+        IFQLProvider FQLProvider { get; }
+        ISaw Saw { get; }
     }
 }

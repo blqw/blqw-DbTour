@@ -15,22 +15,18 @@ namespace blqw
         IFQLBuilder _having;
         IFQLProvider _fql;
 
-        private static IDBHelper GetDbHelper(DbTour tour)
-        {
-            Assertor.AreNull(tour, "tour");
-            return tour._DBHelper;
-        }
-
         public SqlBuilder(DbTour tour, string sql, object[] args)
-            : base(GetDbHelper(tour))
+            : base(tour == null ? null : ((IDbTourProvider)tour).DBHelper)
         {
             Assertor.AreNull(sql, "sql");
+            Assertor.AreNull(tour, "tour");
             if (args == null && sql.Length < 24 && sql.IndexOfAny(new char[] { ' ', '\r', '\n', '\t' }) == -1)
             {
                 sql = "SELECT * FROM " + sql;
             }
-            _fql = tour._FQLProvider;
+            _fql = ((IDbTourProvider)tour).FQLProvider;
             _where = FQL.Format(_fql, sql, args).AsBuilder("WHERE");
+
         }
 
         public void And(string sql, params object[] args)
@@ -61,32 +57,34 @@ namespace blqw
             if (_having == null) _having = FQL.CreateBuilder(_fql, "HAVING");
             _having.Or(sql, args);
         }
-
-        public override DbParameter[] Parameters
+        
+        protected override void InitExecute()
         {
-            get
+            Executed = null;
+            var p = new List<DbParameter>(_where.DbParameters);
+            string a = null, b = null, c = null;
+            if (_order != null && _order.IsEmpty() == false)
             {
-                var p = new List<DbParameter>(_where.DbParameters);
-                if (_order != null)
-                    p.AddRange(_order.DbParameters);
-                if (_group != null)
-                    p.AddRange(_group.DbParameters);
-                if (_having != null)
-                    p.AddRange(_having.DbParameters);
-                return p.ToArray();
+                p.AddRange(_order.DbParameters);
+                a = _order.CommandText;
+                Executed += _order.ImportOutParameter;
             }
+            if (_group != null && _group.IsEmpty() == false)
+            {
+                p.AddRange(_group.DbParameters);
+                b = _group.CommandText;
+                Executed += _group.ImportOutParameter;
+            }
+            if (_having != null && _having.IsEmpty() == false)
+            {
+                p.AddRange(_having.DbParameters);
+                c = _having.CommandText;
+                Executed += _having.ImportOutParameter;
+            }
+            Parameters = p.ToArray();
+            CommandText = string.Concat(_where.CommandText, a, b, c);
         }
 
-        private void Executed()
-        {
-            _where.ImportOutParameter();
-            if (_order != null)
-                _order.ImportOutParameter();
-            if (_group != null)
-                _group.ImportOutParameter();
-            if (_having != null)
-                _having.ImportOutParameter();
-        }
 
     }
 }

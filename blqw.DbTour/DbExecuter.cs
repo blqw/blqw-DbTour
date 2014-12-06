@@ -10,12 +10,14 @@ namespace blqw
     {
         public DbExecuter(IDBHelper helper)
         {
+            Assertor.AreNull(helper, "IDBHelper");
             _helper = helper;
             _commandType = CommandType.Text;
         }
 
         public DbExecuter(IDBHelper helper, CommandType commandType, string commandtext, DbParameter[] parameters, System.Threading.ThreadStart executed)
         {
+            Assertor.AreNull(helper, "IDBHelper");
             _helper = helper;
             CommandText = commandtext;
             Parameters = parameters;
@@ -25,11 +27,15 @@ namespace blqw
 
         private IDBHelper _helper;
         private CommandType _commandType;
-        private DbParameter[] _parameters;
-        public virtual string CommandText { get; private set; }
-        public virtual DbParameter[] Parameters { get; private set; }
+        public string CommandText { get; protected set; }
+        public DbParameter[] Parameters { get; protected set; }
 
-        private System.Threading.ThreadStart Executed;
+        protected System.Threading.ThreadStart Executed;
+
+        protected virtual void InitExecute()
+        { 
+            
+        }
 
         protected virtual void OnExecuted()
         {
@@ -42,17 +48,17 @@ namespace blqw
         public VarObejct GetOutValue(string name)
         {
             Assertor.AreNullOrWhiteSpace(name, "name");
-            if (_parameters == null)
+            if (Parameters == null)
             {
                 throw new InvalidOperationException("尚未执行查询,无法获得返回值");
             }
 
-            var length = _parameters.Length;
+            var length = Parameters.Length;
             for (int i = 0; i < length; i++)
             {
-                if (_parameters[i].ParameterName == name)
+                if (Parameters[i].ParameterName == name)
                 {
-                    return new VarObejct(_parameters[i].Value);
+                    return new VarObejct(Parameters[i].Value);
                 }
             }
             throw new KeyNotFoundException("没有找到该名称的参数");
@@ -62,8 +68,8 @@ namespace blqw
         {
             try
             {
-                _parameters = Parameters;
-                return _helper.ExecuteSet(_commandType, CommandText, _parameters);
+                InitExecute();
+                return _helper.ExecuteSet(_commandType, CommandText, Parameters);
             }
             finally
             {
@@ -75,8 +81,8 @@ namespace blqw
         {
             try
             {
-                _parameters = Parameters;
-                return _helper.ExecuteTable(_commandType, CommandText, _parameters);
+                InitExecute();
+                return _helper.ExecuteTable(_commandType, CommandText, Parameters);
             }
             finally
             {
@@ -89,8 +95,8 @@ namespace blqw
             Assertor.AreNull(action, "action");
             try
             {
-                _parameters = Parameters;
-                using (var reader = _helper.ExecuteReader(_commandType, CommandText, _parameters))
+                InitExecute();
+                using (var reader = _helper.ExecuteReader(_commandType, CommandText, Parameters))
                 {
                     action(reader);
                 }
@@ -106,8 +112,8 @@ namespace blqw
             Assertor.AreNull(func, "func");
             try
             {
-                _parameters = Parameters;
-                using (var reader = _helper.ExecuteReader(_commandType, CommandText, _parameters))
+                InitExecute();
+                using (var reader = _helper.ExecuteReader(_commandType, CommandText, Parameters))
                 {
                     return func(reader);
                 }
@@ -122,8 +128,8 @@ namespace blqw
         {
             try
             {
-                _parameters = Parameters;
-                return new VarObejct(_helper.ExecuteScalar(_commandType, CommandText, _parameters));
+                InitExecute();
+                return new VarObejct(_helper.ExecuteScalar(_commandType, CommandText, Parameters));
             }
             finally
             {
@@ -135,8 +141,8 @@ namespace blqw
         {
             try
             {
-                _parameters = Parameters;
-                return (T)Convert2.ChangedType(_helper.ExecuteScalar(_commandType, CommandText, _parameters), typeof(T));
+                InitExecute();
+                return (T)Convert2.ChangedType(_helper.ExecuteScalar(_commandType, CommandText, Parameters), typeof(T));
             }
             finally
             {
@@ -148,8 +154,8 @@ namespace blqw
         {
             try
             {
-                _parameters = Parameters;
-                return (T)Convert2.ChangedType(_helper.ExecuteScalar(_commandType, CommandText, _parameters), typeof(T), defaultValue, false);
+                InitExecute();
+                return (T)Convert2.ChangedType(_helper.ExecuteScalar(_commandType, CommandText, Parameters), typeof(T), defaultValue, false);
             }
             finally
             {
@@ -161,8 +167,8 @@ namespace blqw
         {
             try
             {
-                _parameters = Parameters;
-                return _helper.ExecuteNonQuery(_commandType, CommandText, _parameters);
+                InitExecute();
+                return _helper.ExecuteNonQuery(_commandType, CommandText, Parameters);
             }
             finally
             {
@@ -172,8 +178,8 @@ namespace blqw
 
         public void Execute()
         {
-            _parameters = Parameters;
-            _helper.ExecuteNonQuery(_commandType, CommandText, _parameters);
+            InitExecute();
+            _helper.ExecuteNonQuery(_commandType, CommandText, Parameters);
             OnExecuted();
         }
 
@@ -181,8 +187,8 @@ namespace blqw
         {
             try
             {
-                _parameters = Parameters;
-                using (var reader = _helper.ExecuteReader(_commandType, CommandText, _parameters))
+                InitExecute();
+                using (var reader = _helper.ExecuteReader(_commandType, CommandText, Parameters))
                 {
                     return Convert2.ToList<T>(reader);
                 }
@@ -198,8 +204,8 @@ namespace blqw
             Assertor.AreNull(convert, "convert");
             try
             {
-                _parameters = Parameters;
-                using (var reader = _helper.ExecuteReader(_commandType, CommandText, _parameters))
+                InitExecute();
+                using (var reader = _helper.ExecuteReader(_commandType, CommandText, Parameters))
                 {
                     var row = new RowRecord(reader, true);
                     var list = new List<T>();
@@ -220,8 +226,8 @@ namespace blqw
         {
             try
             {
-                _parameters = Parameters;
-                using (var reader = _helper.ExecuteReader(_commandType, CommandText, _parameters))
+                InitExecute();
+                using (var reader = _helper.ExecuteReader(_commandType, CommandText, Parameters))
                 {
                     if (reader.Read())
                     {
@@ -243,8 +249,8 @@ namespace blqw
             Assertor.AreNull(convert, "convert");
             try
             {
-                _parameters = Parameters;
-                using (var reader = _helper.ExecuteReader(_commandType, CommandText, _parameters))
+                InitExecute();
+                using (var reader = _helper.ExecuteReader(_commandType, CommandText, Parameters))
                 {
                     if (reader.Read())
                     {
@@ -268,8 +274,8 @@ namespace blqw
 
             try
             {
-                _parameters = Parameters;
-                using (var reader = _helper.ExecuteReader(_commandType, CommandText, _parameters))
+                InitExecute();
+                using (var reader = _helper.ExecuteReader(_commandType, CommandText, Parameters))
                 {
                     List<object> list = new List<object>();
                     var length = reader.FieldCount;
@@ -310,8 +316,8 @@ namespace blqw
             }
             try
             {
-                _parameters = Parameters;
-                using (var reader = _helper.ExecuteReader(_commandType, CommandText, _parameters))
+                InitExecute();
+                using (var reader = _helper.ExecuteReader(_commandType, CommandText, Parameters))
                 {
                     if (reader.Read())
                     {

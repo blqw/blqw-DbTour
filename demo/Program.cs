@@ -12,15 +12,14 @@ namespace demo
     {
         static void Main(string[] args)
         {
+            DbTour_Linq_Demo.Demo();
+
             //CreateTable();
 
             //DbTour_Demo.Demo();
 
-
-            DbTour_Linq_Demo.Demo();
-
-
-
+            //DbTour_Linq_Demo.Demo();
+     
             //DropTable();
         }
 

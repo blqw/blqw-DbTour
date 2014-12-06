@@ -1,55 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
-using System.Linq.Expressions;
-using System.ComponentModel;
-using System.Collections;
 
 namespace blqw
 {
-    public class DbTable<T> : IQueryable<T>, IQueryProvider //, IListSource, IOrderedQueryable, IOrderedQueryable<T>
+    public partial class DbTable<T> : IQueryProvider
     {
-        private DbTour _db;
-        private DbTourProvider _prov;
-
-        public DbTable(DbTour db)
-        {
-            _db = db;
-            Expression = Expression.Constant(this);
-            _prov = new DbTourProvider();
-            _db.TransProvider(_prov);
-            if (_prov.Saw == null)
-            {
-                _prov.Saw = SqlServerSaw.Instance;
-            }
-        }
-
-
-
-        public IEnumerator<T> GetEnumerator()
-        {
-            throw new NotImplementedException();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            throw new NotImplementedException();
-        }
-
-        public Type ElementType
-        {
-            get { throw new NotImplementedException(); }
-        }
-
-        public Expression Expression { get; private set; }
-
-        public IQueryProvider Provider
-        {
-            get { return this; }
-        }
-
         public IQueryable<TElement> CreateQuery<TElement>(Expression expression)
         {
             if (expression.NodeType != ExpressionType.Call)
@@ -62,13 +21,13 @@ namespace blqw
                 case "Where":
                     //Expression.Lambda(call.Arguments[1], call.Arguments[0]);
                     var expr = ((UnaryExpression)call.Arguments[1]).Operand as LambdaExpression;
-                    
+
                     if (expr == null)
                     {
                         throw new NotSupportedException("expression不是有效的LambdaExpression对象");
                     }
                     var faller = Faller.Create(expr);
-                    var sql = faller.ToWhere(_prov.Saw);
+                    var sql = faller.ToWhere(_Saw);
                     Console.WriteLine(sql);
                     return new DbTable<TElement>(_db);
                 default:
@@ -91,5 +50,6 @@ namespace blqw
         {
             throw new NotImplementedException();
         }
+
     }
 }

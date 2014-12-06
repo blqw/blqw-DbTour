@@ -13,9 +13,19 @@ namespace demo
         {
             using (var db = new DbTour())
             {
-                var user = db.Table<User>().Where(it => it.ID == 1).FirstOrDefault();
-                Console.WriteLine(string.Join(" | ", user.ID, user.Name, user.Sex, user.Birthday));
+                var u = db.Table<User>().Where(it => it.ID == 7).FirstOrDefault();
+                Console.WriteLine(u);
             }
+            //    var a = from u1 in db.Table<User>()
+            //            from u2 in db.Table<User>()
+            //            from u3 in db.Table<User>()
+            //            where u1.ID == u2.ID && u1.Name == "xxx"
+            //            select u2;
+
+
+            //    var user = db.Table<User>().Where(it => it.ID == 1).FirstOrDefault();
+            //    Console.WriteLine(string.Join(" | ", user.ID, user.Name, user.Sex, user.Birthday));
+            //}
         }
 
     }

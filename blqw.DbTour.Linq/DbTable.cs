@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 namespace blqw
 {
     public sealed class DbTable<T> : DbExecuter
-        where T : new()
     {
         private DbTour _db;
         private ISaw _saw;
@@ -125,7 +124,6 @@ namespace blqw
         }
 
         public DbTable<TResult> Select<TResult>(Expression<Func<T, TResult>> selector)
-            where TResult : new()
         {
             var faller = Faller.Create(selector);
             _where.Append((_where.Length == 0) ? " ORDER BY " : " ,");
@@ -170,17 +168,31 @@ namespace blqw
 
         public int Count()
         {
-            return (int)LongCount();
+            using (_verb.TemporaryArchive())
+            using (_select.TemporaryArchive())
+            {
+                _select.Append(" COUNT(1)");
+                return base.ExecuteScalar<int>();
+            }
         }
 
         public long LongCount()
         {
-            throw new Exception();
+            using (_verb.TemporaryArchive())
+            using (_select.TemporaryArchive())
+            {
+                _select.Append(" COUNT(1)");
+                return base.ExecuteScalar<long>();
+            }
         }
 
         public T FirstOrDefault()
         {
-            return base.FirstOrDefault<T>();
+            using (_verb.TemporaryArchive())
+            {
+                _verb.Append(" TOP 1");
+                return base.FirstOrDefault<T>();
+            }
         }
     }
 }

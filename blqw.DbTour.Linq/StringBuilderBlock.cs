@@ -10,8 +10,9 @@ namespace blqw
     {
         private StringBuilder _Buffer;
         private int _Start;
-        public int Length { get; private set; }
         private Action<int> _SendChangedLength;
+
+        public int Length { get; private set; }
 
         public static StringBuilderBlock[] Array(int count)
         {
@@ -20,7 +21,7 @@ namespace blqw
             Action<int> action = null;
             for (int i = count - 1; i >= 0; i--)
             {
-                var sbb = new StringBuilderBlock { _Buffer = sb,_Start = sb.Length };
+                var sbb = new StringBuilderBlock { _Buffer = sb, _Start = sb.Length };
                 sbb._SendChangedLength = action;
                 action = sbb.OnChangedStart;
                 array[i] = sbb;
@@ -32,6 +33,43 @@ namespace blqw
         {
             return _Buffer.ToString();
         }
+
+        public IDisposable TemporaryArchive()
+        {
+            return new StringBuilderBlockArchive(this);
+        }
+
+        struct StringBuilderBlockArchive : IDisposable
+        {
+            private StringBuilderBlock _sbb;
+            private string _archive;
+            public StringBuilderBlockArchive(StringBuilderBlock sbb)
+            {
+                _sbb = sbb;
+                if (_sbb.Length == 0)
+                {
+                    _archive = "";
+                }
+                else
+                {
+                    _archive = _sbb.ToString();
+                    _sbb.Clear();
+                }
+            }
+            public void Dispose()
+            {
+                if (_archive != null)
+                {
+                    _sbb.Clear();
+                    if (_archive.Length > 0)
+                    {
+                        _sbb.Append(_archive);
+                    }
+                    _archive = null;
+                }
+            }
+        }
+        
         private void OnChangedStart(int count)
         {
             _Start += count;

@@ -13,7 +13,11 @@ namespace demo
         {
             using (var db = new DbTour())
             {
-                var u = db.Table<User>().Where(it => it.ID == 7).FirstOrDefault();
+                var u = db.Table<User>().Where(it => it.ID == 7)
+                            .Select(it => new {
+                                A = db.Table<User>().Where(x => x.Sex == it.Sex).Select(x => x.Name).FirstOrDefault()
+                            }
+                            ).FirstOrDefault();
                 Console.WriteLine(u);
             }
             //    var a = from u1 in db.Table<User>()

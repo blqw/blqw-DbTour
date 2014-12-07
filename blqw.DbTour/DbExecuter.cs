@@ -222,7 +222,7 @@ namespace blqw
             }
         }
 
-        public T FirstOrDefault<T>(T defaultValue = default(T)) where T : new()
+        public T FirstOrDefault<T>(T defaultValue = default(T))
         {
             try
             {
@@ -232,9 +232,11 @@ namespace blqw
                     if (reader.Read())
                     {
 
-                        var t = new T();
-                        Convert2.FillEntity(reader, ref t);
-                        return t;
+                        T t = default(T);
+                        if (Convert2.FillEntity(reader, ref t))
+                        {
+                            return t;
+                        }
                     }
                     return defaultValue;
                 }

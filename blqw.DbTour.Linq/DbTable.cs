@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace blqw
 {
-    public sealed class DbTable<T> : DbExecuter
+    public sealed class DbTable<T> : DbExecuter, ISubExpression
     {
         private DbTour _db;
         private ISaw _saw;
@@ -193,6 +193,19 @@ namespace blqw
                 _verb.Append(" TOP 1");
                 return base.FirstOrDefault<T>();
             }
+        }
+
+        LambdaExpression _ParentExpression;
+
+        LambdaExpression ISubExpression.ParentExpression
+        {
+            get { return _ParentExpression; }
+            set { _ParentExpression = value; }
+        }
+
+        string ISubExpression.GetSqlString(ISawDust[] args)
+        {
+            return string.Concat("(", _select.AllString(), ")");
         }
     }
 }

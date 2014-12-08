@@ -45,6 +45,7 @@
     <Compile Include="Faller\implement\Faller.cs" />
     <Compile Include="Faller\implement\SqlServerSaw.cs" />
     <Compile Include="Faller\interface\IFaller.cs" />
+    <Compile Include="Faller\interface\ISubExpression.cs" />
     <Compile Include="Faller\Literacy\AttributeCollection.cs" />
     <Compile Include="Faller\Literacy\Convert2.cs" />
     <Compile Include="Faller\Literacy\Delegate.cs" />

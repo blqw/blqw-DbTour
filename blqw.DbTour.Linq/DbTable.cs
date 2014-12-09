@@ -14,11 +14,14 @@ namespace blqw
         private ISaw _saw;
         private StringBuilderBlock _verb;
         private StringBuilderBlock _select;
+        private StringBuilderBlock _from;
         private StringBuilderBlock _where;
         private StringBuilderBlock _order;
         private StringBuilderBlock _group;
         private StringBuilderBlock _having;
         private List<DbParameter> _parameters;
+        private LambdaExpression _parentExpression;
+        private bool _enabledAlias;
 
         private static IDBHelper Init(DbTour db)
         {
@@ -34,7 +37,8 @@ namespace blqw
             arr[0].Append("SELECT");
             _verb = arr[1];
             _select = arr[2];
-            arr[3].Append(" FROM ").Append(_saw.WarpName(SourceNameAttribute.GetName(typeof(T))));
+            _from = arr[3];
+            //arr[3].Append(" FROM ").Append(_saw.WarpName(SourceNameAttribute.GetName(typeof(T))));
             _where = arr[4];
             _order = arr[5];
             _group = arr[6];
@@ -56,13 +60,23 @@ namespace blqw
             {
                 CommandText = _select.AllString();
             }
+            _from.Clear();
+            _from.Append(" FROM ").Append(_saw.WarpName(SourceNameAttribute.GetName(typeof(T))));
+            if (_parentExpression != null)
+            {
+                _from.Append(' ').Append(('a' + _parentExpression.Parameters.Count) + "");
+            }
+            else if(_enabledAlias)
+            {
+                _from.Append(" a");
+            }
             Parameters = _parameters.ToArray();
         }
 
 
         public DbTable<T> Where(Expression<Func<T, bool>> predicate)
         {
-            var faller = Faller.Create(predicate);
+            var faller = Faller.Create(predicate, _parentExpression);
             _where.Append((_where.Length == 0) ? " WHERE (" : " AND (");
             _where.Append(faller.ToWhere(_saw));
             _where.Append(')');
@@ -72,44 +86,53 @@ namespace blqw
 
         public DbTable<T> Or(Expression<Func<T, bool>> predicate)
         {
-            var faller = Faller.Create(predicate);
+            var faller = Faller.Create(predicate, _parentExpression);
             _where.Append((_where.Length == 0) ? " WHERE (" : " OR (");
             _where.Append(faller.ToWhere(_saw));
             _where.Append(')');
             _parameters.AddRange(faller.Parameters);
+            if (!_enabledAlias)
+                _enabledAlias = faller.ExistsSubExpression;
             return this;
         }
 
         public DbTable<T> Distinct()
         {
+            _verb.Clear();
             _verb.Append(" DISTINCT");
             return this;
         }
 
         public DbTable<T> GroupBy(Expression<Func<T, object>> fields)
         {
-            var faller = Faller.Create(fields);
-            _group.Append((_where.Length == 0) ? " GROUP BY " : " ,");
+            var faller = Faller.Create(fields, _parentExpression);
+            _group.Append((_group.Length == 0) ? " GROUP BY " : " ,");
             _group.Append(faller.ToSelectColumns(_saw));
             _parameters.AddRange(faller.Parameters);
+            if (!_enabledAlias)
+                _enabledAlias = faller.ExistsSubExpression;
             return this;
         }
 
         public DbTable<T> OrderBy(Expression<Func<T, object>> fields)
         {
-            var faller = Faller.Create(fields);
-            _order.Append((_where.Length == 0) ? " ORDER BY " : " ,");
+            var faller = Faller.Create(fields, _parentExpression);
+            _order.Append((_order.Length == 0) ? " ORDER BY " : " ,");
             _order.Append(faller.ToOrderBy(_saw, true));
             _parameters.AddRange(faller.Parameters);
+            if (!_enabledAlias)
+                _enabledAlias = faller.ExistsSubExpression;
             return this;
         }
 
         public DbTable<T> OrderByDescending(Expression<Func<T, object>> fields)
         {
-            var faller = Faller.Create(fields);
-            _order.Append((_where.Length == 0) ? " ORDER BY " : " ,");
+            var faller = Faller.Create(fields, _parentExpression);
+            _order.Append((_order.Length == 0) ? " ORDER BY " : " ,");
             _order.Append(faller.ToOrderBy(_saw, false));
             _parameters.AddRange(faller.Parameters);
+            if (!_enabledAlias)
+                _enabledAlias = faller.ExistsSubExpression;
             return this;
         }
 
@@ -125,10 +148,13 @@ namespace blqw
 
         public DbTable<TResult> Select<TResult>(Expression<Func<T, TResult>> selector)
         {
-            var faller = Faller.Create(selector);
-            _where.Append((_where.Length == 0) ? " ORDER BY " : " ,");
-            _where.Append(faller.ToSelectColumns(_saw));
+            _select.Clear();
+            var faller = Faller.Create(selector, _parentExpression);
+            _select.Append(' ');
+            _select.Append(faller.ToSelectColumns(_saw));
             _parameters.AddRange(faller.Parameters);
+            if (!_enabledAlias)
+                _enabledAlias = faller.ExistsSubExpression;
             return new DbTable<TResult>(_db) {
                 _group = _group,
                 _having = _having,
@@ -138,6 +164,8 @@ namespace blqw
                 _select = _select,
                 _verb = _verb,
                 _where = _verb,
+                _parentExpression = _parentExpression,
+                _enabledAlias = _enabledAlias,
             };
         }
 
@@ -195,12 +223,11 @@ namespace blqw
             }
         }
 
-        LambdaExpression _ParentExpression;
 
         LambdaExpression ISubExpression.ParentExpression
         {
-            get { return _ParentExpression; }
-            set { _ParentExpression = value; }
+            get { return _parentExpression; }
+            set { _parentExpression = value; }
         }
 
         string ISubExpression.GetSqlString(ISawDust[] args)

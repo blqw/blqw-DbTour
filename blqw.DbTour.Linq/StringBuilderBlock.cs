@@ -157,8 +157,11 @@ namespace blqw
         public StringBuilderBlock Clear()
         {
             var count = _Buffer.Length;
-            _Buffer.Remove(_Start, Length);
-            OnChangedLength(_Buffer.Length - count);
+            if (count > 0)
+            {
+                _Buffer.Remove(_Start, Length);
+                OnChangedLength(_Buffer.Length - count);
+            }
             return this;
         }
         public StringBuilderBlock Remove(int startIndex, int length)

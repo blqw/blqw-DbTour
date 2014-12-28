@@ -188,3 +188,5 @@ GeneratedArtifacts/
 _Pvt_Extensions/
 ModelManifest.xml
 /blqw.DbTour/Faller
+/blqw.DbTour/FQL/Literacy
+/blqw.DbTour.Linq/Faller/Literacy/MemberMappingAttribute.cs

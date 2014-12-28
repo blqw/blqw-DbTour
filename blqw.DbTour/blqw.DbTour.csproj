@@ -65,7 +65,8 @@
     <Compile Include="Faller\interface\ISawDust.cs" />
     <Compile Include="IDbComponentFactory.cs" />
     <Compile Include="IDbTourProvider.cs" />
-    <Compile Include="Literacy\IMemberMappingAttributre.cs" />
+    <Compile Include="Literacy\IMemberMappingAttribute.cs" />
+    <Compile Include="Literacy\MemberMappingAttribute.cs" />
     <Compile Include="RowRecord.cs" />
     <Compile Include="DbTour.cs" />
     <Compile Include="SqlBuilder.cs" />

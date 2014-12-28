@@ -1302,7 +1302,16 @@ namespace blqw
                 var method = expr.Method;
                 if (subexpr != null && !TypesHelper.IsChild(typeof(ISubExpression), method.ReturnType))
                 {
-                    _state.Sql = subexpr.GetSqlString(args);
+                    subexpr.IsParsingPattern = true;
+                    method.Invoke(target.Value, args.Select(it => it.Value).ToArray());
+                    subexpr.IsParsingPattern = false;
+                    _state.Sql = subexpr.CommandText;
+                    var ps = subexpr.Parameters;
+                    var pl = subexpr.Parameters.Length;
+                    for (int j = 0; j < pl; j++)
+                    {
+                        Parameters.Add(ps[j]);
+                    }
                 }
                 else
                 {

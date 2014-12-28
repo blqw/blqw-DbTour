@@ -12,6 +12,7 @@ namespace blqw
     {
         private DbTour _db;
         private ISaw _saw;
+        private string _tableName;
         private StringBuilderBlock _verb;
         private StringBuilderBlock _select;
         private StringBuilderBlock _from;
@@ -22,23 +23,29 @@ namespace blqw
         private List<DbParameter> _parameters;
         private LambdaExpression _parentExpression;
         private bool _enabledAlias;
+        bool _isParsingPattern;
 
         private static IDBHelper Init(DbTour db)
         {
             Assertor.AreNull(db, "db");
             return ((IDbTourProvider)db).DBHelper;
         }
+        private DbTable(IDBHelper helper)
+            : base(helper)
+        {
+
+        }
         public DbTable(DbTour db)
             : base(Init(db))
         {
             _db = db;
             _saw = ((IDbTourProvider)db).Saw ?? SqlServerSaw.Instance;
+            _tableName = _saw.WarpName(SourceNameAttribute.GetName(typeof(T)));
             var arr = StringBuilderBlock.Array(8);
             arr[0].Append("SELECT");
             _verb = arr[1];
             _select = arr[2];
             _from = arr[3];
-            //arr[3].Append(" FROM ").Append(_saw.WarpName(SourceNameAttribute.GetName(typeof(T))));
             _where = arr[4];
             _order = arr[5];
             _group = arr[6];
@@ -50,6 +57,17 @@ namespace blqw
 
         protected override void InitExecute()
         {
+            _from.Clear();
+            _from.Append(" FROM ").Append(_tableName);
+            if (_parentExpression != null)
+            {
+                _from.Append(" AS ").Append((char)('A' + _parentExpression.Parameters.Count));
+            }
+            else if (_enabledAlias)
+            {
+                _from.Append(" AS A");
+            }
+            Console.WriteLine(_from.AllString());
             if (_select.Length == 0)
             {
                 _select.Append(" *");
@@ -59,16 +77,6 @@ namespace blqw
             else
             {
                 CommandText = _select.AllString();
-            }
-            _from.Clear();
-            _from.Append(" FROM ").Append(_saw.WarpName(SourceNameAttribute.GetName(typeof(T))));
-            if (_parentExpression != null)
-            {
-                _from.Append(' ').Append(('a' + _parentExpression.Parameters.Count) + "");
-            }
-            else if(_enabledAlias)
-            {
-                _from.Append(" a");
             }
             Parameters = _parameters.ToArray();
         }
@@ -155,17 +163,20 @@ namespace blqw
             _parameters.AddRange(faller.Parameters);
             if (!_enabledAlias)
                 _enabledAlias = faller.ExistsSubExpression;
-            return new DbTable<TResult>(_db) {
+            return new DbTable<TResult>(((IDbTourProvider)_db).DBHelper) {
+                _db = _db,
+                _saw = _saw,
+                _verb = _verb,
+                _select = _select,
+                _from = _from,
+                _where = _where,
+                _order = _order,
                 _group = _group,
                 _having = _having,
-                _order = _order,
                 _parameters = _parameters,
-                _saw = _saw,
-                _select = _select,
-                _verb = _verb,
-                _where = _verb,
                 _parentExpression = _parentExpression,
                 _enabledAlias = _enabledAlias,
+                _tableName = _tableName,
             };
         }
 
@@ -219,6 +230,11 @@ namespace blqw
             using (_verb.TemporaryArchive())
             {
                 _verb.Append(" TOP 1");
+                if (_isParsingPattern)
+                {
+                    InitExecute();
+                    return default(T);
+                }
                 return base.FirstOrDefault<T>();
             }
         }
@@ -229,10 +245,11 @@ namespace blqw
             get { return _parentExpression; }
             set { _parentExpression = value; }
         }
-
-        string ISubExpression.GetSqlString(ISawDust[] args)
+        bool ISubExpression.IsParsingPattern
         {
-            return string.Concat("(", _select.AllString(), ")");
+            get { return _isParsingPattern; }
+            set { _isParsingPattern = value; }
         }
+
     }
 }

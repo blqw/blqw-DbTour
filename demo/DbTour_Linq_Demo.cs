@@ -15,7 +15,7 @@ namespace demo
             {
                 var u = db.Table<User>()//.Where(it => it.ID == 7)
                             .Select(it => new {
-                                A = db.Table<User>().Where(x => x.Sex == it.Sex).Select(x => x.Name).FirstOrDefault()
+                                XX = db.Table<User>().Where(x => x.Sex == it.Sex).Select(x => x.Name).FirstOrDefault()
                             }
                             ).FirstOrDefault();
                 Console.WriteLine(u);

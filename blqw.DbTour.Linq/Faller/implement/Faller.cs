@@ -1305,7 +1305,7 @@ namespace blqw
                     subexpr.IsParsingPattern = true;
                     method.Invoke(target.Value, args.Select(it => it.Value).ToArray());
                     subexpr.IsParsingPattern = false;
-                    _state.Sql = subexpr.CommandText;
+                    _state.Sql = string.Concat("(", subexpr.CommandText, ")");
                     var ps = subexpr.Parameters;
                     var pl = subexpr.Parameters.Length;
                     for (int j = 0; j < pl; j++)

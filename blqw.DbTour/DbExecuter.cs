@@ -56,7 +56,7 @@ namespace blqw
             var length = Parameters.Length;
             for (int i = 0; i < length; i++)
             {
-                if (Parameters[i].ParameterName == name)
+                if (string.Equals(Parameters[i].ParameterName, name, StringComparison.OrdinalIgnoreCase))
                 {
                     return new VarObejct(Parameters[i].Value);
                 }
